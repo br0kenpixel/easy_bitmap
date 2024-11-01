@@ -133,4 +133,34 @@ impl<T: PrimInt + ConstZero + ConstOne + num_widths::ConstWidth> BitMap<T> {
 
         Ok(())
     }
+
+    /// Counts all ones in the bitmap.
+    /// ```rust
+    /// # use easy_bitmap::BitMap;
+    /// let mut my_bitmap: BitMap<u8> = BitMap::new();
+    ///
+    /// my_bitmap.replace(4);
+    /// assert_eq!(my_bitmap.count_ones(), 1);
+    ///
+    /// my_bitmap.replace(5);
+    /// assert_eq!(my_bitmap.count_ones(), 2);
+    /// ```
+    pub fn count_ones(&self) -> usize {
+        self.0.count_ones() as _
+    }
+
+    /// Counts all ones in the bitmap.
+    /// ```rust
+    /// # use easy_bitmap::BitMap;
+    /// let mut my_bitmap: BitMap<u8> = BitMap::new();
+    ///
+    /// my_bitmap.replace(4);
+    /// assert_eq!(my_bitmap.count_zeros(), 7);
+    ///
+    /// my_bitmap.replace(5);
+    /// assert_eq!(my_bitmap.count_zeros(), 6);
+    /// ```
+    pub fn count_zeros(&self) -> usize {
+        self.0.count_zeros() as _
+    }
 }
