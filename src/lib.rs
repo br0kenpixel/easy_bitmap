@@ -1,7 +1,9 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
+use iterators::BitMapIter;
 use num_traits::{ConstOne, ConstZero, PrimInt};
 mod error;
+mod iterators;
 mod num_widths;
 pub mod prelude;
 
@@ -168,5 +170,65 @@ impl<T: PrimInt + ConstZero + ConstOne + num_widths::ConstWidth> BitMap<T> {
     /// ```
     pub fn count_zeros(&self) -> usize {
         self.0.count_zeros() as _
+    }
+
+    /// Creates an iterator that internally references the bitmap.
+    ///
+    /// ```rust
+    /// # use easy_bitmap::BitMap;
+    /// let mut my_bitmap: BitMap<u8> = BitMap::new();
+    /// my_bitmap.replace(255); // 11111111
+    ///
+    /// let mut iterator = my_bitmap.iter();
+    ///
+    /// for _ in 0..8 {
+    ///     assert_eq!(iterator.next(), Some(true));
+    /// }
+    ///
+    /// assert_eq!(iterator.next(), None);
+    /// ```
+    ///
+    /// The iterator is only valid as long as the bitmap.
+    /// ```rust,compile_fail
+    /// # use easy_bitmap::BitMap;
+    /// let mut iterator;
+    ///
+    /// {
+    ///     let mut my_bitmap: BitMap<u8> = BitMap::new();
+    ///     iterator = my_bitmap.iter();
+    /// }
+    ///
+    /// iterator.next(); // error: use after drop
+    /// ```
+    pub fn iter(&self) -> BitMapIter<'_, T> {
+        self.into_iter()
+    }
+}
+
+impl<'b, T: PrimInt + ConstZero + ConstOne + num_widths::ConstWidth> IntoIterator
+    for &'b BitMap<T>
+{
+    type IntoIter = iterators::BitMapIter<'b, T>;
+    type Item = bool;
+
+    fn into_iter(self) -> Self::IntoIter {
+        iterators::BitMapIter {
+            bitmap: self,
+            pos: 0,
+            pos_back: T::WIDTH - 1,
+        }
+    }
+}
+
+impl<T: PrimInt + ConstZero + ConstOne + num_widths::ConstWidth> IntoIterator for BitMap<T> {
+    type IntoIter = iterators::IntoBitMapIter<T>;
+    type Item = bool;
+
+    fn into_iter(self) -> Self::IntoIter {
+        iterators::IntoBitMapIter {
+            bitmap: self,
+            pos: 0,
+            pos_back: T::WIDTH - 1,
+        }
     }
 }
