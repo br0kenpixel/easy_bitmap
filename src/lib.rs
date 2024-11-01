@@ -90,6 +90,9 @@ impl<T: PrimInt + ConstZero + ConstOne + num_widths::ConstWidth> BitMap<T> {
 
     /// Sets the nth bit of the bitmap.
     ///
+    /// # Errors
+    /// This will return an error if the index is out of bounds.
+    ///
     /// ```rust
     /// # use easy_bitmap::BitMap;
     /// let mut my_bitmap: BitMap<u8> = BitMap::new();
@@ -103,15 +106,18 @@ impl<T: PrimInt + ConstZero + ConstOne + num_widths::ConstWidth> BitMap<T> {
         }
 
         if value {
-            self.0 = self.0 | (T::ONE << index)
+            self.0 = self.0 | (T::ONE << index);
         } else {
-            self.0 = self.0 & !(T::ONE << index)
+            self.0 = self.0 & !(T::ONE << index);
         }
 
         Ok(())
     }
 
     /// Flips the nth bit of the bitmap.
+    ///
+    /// # Errors
+    /// This will return an error if the index is out of bounds.
     ///
     /// ```rust
     /// # use easy_bitmap::BitMap;
